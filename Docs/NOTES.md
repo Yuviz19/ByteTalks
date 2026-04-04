@@ -165,4 +165,28 @@ we are passing the variable as a key value pair into the function.
   - And {% %}{% end %} for functions related to python.
 
 # Dynamic Routings
-  -
+  - routings to different pages/rooms of the site.
+  - so for that we can add 
+
+```python
+  path('room/<str:pk>/', views.room, name="room"),
+```
+
+  - and in the views file, where the room function is defined, pass "pk" as an argument.
+  - now in the home html file add an "a" tag with the href="/room/{{room.id}}"
+  now when the dynamic link is pressed, that would trigger a url and that would trigger a view,
+  - currently there is no use of "pk". Later on well use the pk to query the DB.
+
+  ```python
+  def room(request, pk):
+    room = None
+    for i in rooms:
+        if i["id"] == pk:
+            room = i
+
+    context = {"room": room}
+
+    return render(request, 'base/room.html', context)
+```
+
+  - now u can use this context dict to access the values
