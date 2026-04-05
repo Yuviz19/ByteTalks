@@ -190,3 +190,130 @@ we are passing the variable as a key value pair into the function.
 ```
 
   - now u can use this context dict to access the values
+
+## Why are we passing in a name in the url file with the path?
+  - lets say in future we are about to change the url room to something else,
+  - so in order for us to not change it elsewhere, we use "name"
+from django.db import models
+from django.contrib.auth.models import User
+
+class Topic(models.Model):
+    name = models.CharField(max_length=200)
+
+    def __str__(self):
+        return self.name
+
+class Room(models.Model):
+    host = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    topic = models.ForeignKey(Topic, on_delete=models.SET_NULL, null=True)
+    name = models.CharField(max_length=200)
+    description = models.TextField(null=True, blank=True) # an empty field is accespted
+    # while the null field is for database, the blank is for form, the user can leave the form empty
+    updated = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
+    # the auto_now means, whenever the table is updated, the value is updated
+    # auto_now_add takse a snapshot only when it was created
+
+    def __str__(self):
+        return self.name
+
+class Message(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    # a relationship betweeen room and message
+    room = models.ForeignKey(Room, on_delete=models.CASCADE) # so if a room gets deleted, all the messages are also deleted
+    body = models.TextField()
+    updated = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.body[0:50]
+  use it in href as 
+  <a href="{% url 'room' room.id %}"></a>
+  - so we use an inbuilt template called url, and then pass the name and also the dynamic aspect 
+
+# Setting up DATABASE and Admin Panel
+  - so initially, django preps ready made databases to be used, they store the session ids of different users, user tables for authentication
+  - but the tables are ready, yet not activated, hence the runserver gives warnings about making migrations.
+  - so to execute the built in tables,
+    "python manage.py migrate"
+    - executes and make tables.
+
+## Adding our own tables
+  - go to the specific app and use the models.py file.
+  - In order to make tables we use python classes
+  - refer to {./Pasted image.png}
+
+  - we create a room first
+
+  ```python
+  from django.db import models
+
+class Room(models.Model):
+    # host
+    # topic
+    name = models.CharField(max_length=200)
+    description = models.TextField(null=True, blank=True) # an empty field is accespted
+    # while the null field is for database, the blank is for form, the user can leave the form empty
+    updated = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
+    # the auto_now means, whenever the table is updated, the value is updated
+    # auto_now_add takse a snapshot only when it was created
+
+    def __str__(self):
+        return str(self.name)
+```
+
+  - everytime we add new tables we have to run "python manage.py makemigrations"
+    - when this is done, the Django compares the tables with the old tables and then, if there are any new ones they are added
+    - then migrate the database
+
+  ## the admin Panel
+    - since we have a database now, we can see the admin panel
+    - go the same base url and then add /admin ta the last of it 
+    - now for to access it you need to have admin level permissions.
+    - to get the username and the password, set it first time
+"python manage.py createsuperuser"
+  - now u are eligible to enter the admin panel
+  - u can add users and entries to the database.
+  - but as we can see currently there is no table for the rooms, this is so because we have to add the database to the admin.py file of the app{subpart of the project}.
+
+```python
+  from django.contrib import admin
+  from .models import Room
+
+  # now register this in the admin panel
+  admin.site.register(Room)
+```
+
+  - now in the admin panel, u can add the rooms manually
+  
+  ## getting the data from the models to the html/Frontend
+  
+  - now we have to get the models so that we can display them in the room and home html file
+  - to get the data from models 
+ 
+```python 
+  from .models import Room 
+```
+
+  - now to use the data from the models,
+  the format is as follows:
+    querySet = ModelName.objects.all(), .get(), .filter(), .exclude()
+      - the querySet holds the response 
+      - ModelName refers to the model that we are using
+      - objects is model objects attribute 
+      - then we can specify what we want from the data.
+
+  - so something like this:
+
+```python
+  def home(request):
+    rooms = Room.objects.all()
+    context = {'rooms': rooms}
+    return render(request, 'base/home.html', context)
+```
+
+  - NOTE - that there is a still an "id" variable, this is still printing there because
+  an "id" variable is generated by default in the database,
+  - now for the dynamic routing in *rooms* function
+
