@@ -1,3 +1,4 @@
+import re
 from django.shortcuts import render, redirect
 from .models import Room
 from .forms import RoomForm
@@ -23,3 +24,16 @@ def create_room(request):
 
     context = {"form":form}
     return render(request, 'base/room_form.html', context)
+
+def update_room(request, pk):
+    room = Room.objects.get(id=pk)
+    form = RoomForm(instance=room) # so the form will be prefilled with some values
+
+    if request.method == 'POST':
+        form = RoomForm(request.POST, instance=room) # pass the instancce, otherwise it will create a new room
+        if form.is_valid():
+            form.save()
+        return redirect('home')
+
+    context = {"form":form}
+    return render(request, 'base/room_form.html',context)

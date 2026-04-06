@@ -385,3 +385,25 @@ class Room(models.Model):
   - this tells the django program that give the form with all the input fields that are present in the room model
   - obiously not including the date and time because they are not editable
   - now u can use the Room form
+
+## Updating Data in the database
+  - to update the data in the database 
+  - create a view and also a view
+    the view would look something like
+  ```python
+  
+def update_room(request, pk):
+    room = Room.objects.get(id=pk)
+    form = RoomForm(instance=room) # so the form will be prefilled with some values
+
+    if request.method == 'POST':
+        form = RoomForm(request.POST, instance=room) # pass the instance, otherwise it will create a new room
+        if form.is_valid():
+            form.save()
+        return redirect('home')
+
+    context = {"form":form}
+    return render(request, 'base/room_form.html',context)
+
+```
+  - the new keyword here is instance
