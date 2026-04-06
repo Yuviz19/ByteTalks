@@ -18,6 +18,9 @@ class Room(models.Model):
     # the auto_now means, whenever the table is updated, the value is updated
     # auto_now_add takse a snapshot only when it was created
 
+    class Meta:
+        ordering = ['-updated','-created']
+
     def __str__(self):
         return self.name
 
