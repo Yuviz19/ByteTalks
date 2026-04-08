@@ -32,7 +32,15 @@ def update_room(request, pk):
         form = RoomForm(request.POST, instance=room) # pass the instancce, otherwise it will create a new room
         if form.is_valid():
             form.save()
-        return redirect('home')
+            return redirect('home')
 
     context = {"form":form}
     return render(request, 'base/room_form.html',context)
+
+def delete_room(request,pk):
+    room = Room.objects.get(id=pk)
+    if request.method == 'POST':
+        room.delete()
+        return redirect('home')
+
+    return render(request, 'base/delete.html', {"obj":room})
