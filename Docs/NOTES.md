@@ -407,3 +407,40 @@ def update_room(request, pk):
 
 ```
   - the new keyword here is instance
+
+## Delete Rooms/Data from database
+  - currently we are working to remove the rooms.
+  1. we make a delete.html file and we want to use it as a universal template everywhere
+  ```html
+
+  {% extends "main.html" %}
+  {% block content %}
+  <form method="POST" action="">
+  {% csrf_token %}
+  <p>Are you sure you want to delete "{{obj}}"?</p>
+  <input type="submit" value="Confirm">
+  <a href="{{request.META.HTTP_REFERER}}">Go Back</a>
+  </form>
+  {% endblock %}
+```
+
+  - we create a form and if the method is post, that is we send some data.
+  - use the csrf_token and ask the user for confirmation.
+  - the user can confirm and delete otherwise use the {{request.META.HTTP_REFERER}} to return the user from where they came from
+  
+  2. the view of the delete function
+  ```python
+  
+def delete_room(request,pk):
+    room = Room.objects.get(id=pk)
+    if request.method == 'POST':
+        room.delete()
+        return redirect('home')
+
+    return render(request, 'base/delete.html', {"obj":room})
+
+```
+
+  - u can directly delete the room with the delete method, and since we are at the room deletion, we can return the user to the home page,
+
+  3. and also add the details at the urls and also at the home.html file.
