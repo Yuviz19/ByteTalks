@@ -444,3 +444,39 @@ def delete_room(request,pk):
   - u can directly delete the room with the delete method, and since we are at the room deletion, we can return the user to the home page,
 
   3. and also add the details at the urls and also at the home.html file.
+
+# Query Refining
+
+- TASK - putting a side bar in the home page so for the multiple room topics, so that the home page only shows the rooms with that topic
+- create a side bar in the home page, style it with grids
+- and with each topic, make it a link that has an -- href to <a href="{% url 'home' %}?q={{topic.name}}">{{topic.name}}</a>
+   and for the normal page make another link with the all -- <a href="{% url 'home' %}">All</a>
+- here the q is the query parameter that is used to the data from the backend.
+- now for the home page rendering the home page
+```python
+
+def home(request):
+    q = request.GET.get('q','')
+
+    rooms = Room.objects.filter(topic__name__icontains=q)
+    topics = Topic.objects.all()
+    context = {
+        'rooms': rooms,
+        'topics': topics,
+    }
+    return render(request, 'base/home.html', context)
+
+```
+
+- Explanation -> so we are using the request.GET.get method, it is a safe way to get a data from a dict which gets created when we asked for that particular page
+- when we asked for the q={{topic.name}}, then a dict was created, where the key was q and the topic name would have been a value,
+- now that is stored in the request.GET as a dict 
+```python 
+
+request.GET = {
+  'q': topic.name,  
+}
+```
+- and then we can get the 'q' using the .get() method
+
+- now we can filter the rooms, using the .filter(topic__name__icontains=q) which means the topic name is equal to q and, (if half written) atleast contain some instance of it, and that too case insensitivly
