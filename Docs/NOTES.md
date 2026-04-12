@@ -480,3 +480,37 @@ request.GET = {
 - and then we can get the 'q' using the .get() method
 
 - now we can filter the rooms, using the .filter(topic__name__icontains=q) which means the topic name is equal to q and, (if half written) atleast contain some instance of it, and that too case insensitivly
+
+## Search bar for querying through room names and also the topics
+- get a search bar in the nav bar 
+  ```html
+  
+<form method="GET" action="{% url 'home' %}">
+    <input type="text" name="q" placeholder="Search Rooms.." />
+</form>
+
+- the action is to show the rooms available with the particular name or topic
+- the html name attribute is the key here,
+  - what the name does is that, when the form is submitted, the form sends an object with a key 'q' which then is used by the room rendering to display rooms.
+- how to query through room topics and also through the name of the room
+
+```python
+rooms = Room.objects.filter(
+        Q(topic__name__icontains=q) |
+        Q(name__icontains=q)
+        )
+```
+
+- import a library "from django.db.models import Q",
+- this helps in querying through the datasets
+- we used an or | so incase matching to the topic or to the name
+
+# User Authentication
+- Task => building user login, registration, and logout functionality
+- django by default has session based authentication
+- so by default django has a sessions management table 
+- so when a user logs in, in the backend there is a sessions token created which store the info about the user 
+- so when a user logs in, there is a session created in the browser as well as in the database, now as we navigate through the pages, we dont keep logging in
+- on each request, the backend checks if a user is logged in or not
+- we are going to use the authentication system, to get the users logged in
+
